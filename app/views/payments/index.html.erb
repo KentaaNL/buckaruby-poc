@@ -1,0 +1,42 @@
+<div class="page-header">
+  <h1>Payments</h1>
+</div>
+
+<p>
+  Start new payment:
+  <% @payment_methods.each do |payment_method| %>
+    <%= link_to show_payment_method(payment_method), new_payment_path(payment_method: payment_method), class: "btn btn-default" %>&nbsp;
+  <% end %>
+</p>
+
+<% if @payments.present? %>
+  <table class="table table-striped">
+    <tr>
+      <th>Started at</th>
+      <th>Amount</th>
+      <th>Description</th>
+      <th>Payment method</th>
+      <th>Status</th>
+      <th>Mode</th>
+      <th>&nbsp;</th>
+    </tr>
+    <% @payments.each do |payment| %>
+      <tr>
+        <td><%= l payment.started_at, format: :long if payment.started_at.present? %></td>
+        <td><%= number_to_currency(payment.amount, precision: 2) %></td>
+        <td><%= payment.description %></td>
+        <td><%= show_payment_method(payment.payment_method) %></td>
+        <td><%= show_payment_status(payment.status) %></td>
+        <td><%= payment.mode.capitalize %></td>
+        <td class="text-right">
+          <% if payment.recurring? && payment.paid? %>
+            <%= link_to "Recur", recur_payment_path(payment), class: "btn btn-default btn-sm" %>
+          <% end %>
+          <%= link_to "Show", payment_path(payment), class: "btn btn-default btn-sm" %>
+          <%= link_to "Update", status_payment_path(payment), method: :post, class: "btn btn-default btn-sm" %>
+          <%= link_to "Destroy", payment_path(payment), method: :delete, data: { confirm: "Are you sure you want to delete this payment?" }, class: "btn btn-danger btn-sm" %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>

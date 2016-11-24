@@ -1,0 +1,50 @@
+<div class="page-header">
+  <h1>Payment <small><%= show_payment_method(@payment.payment_method) %></small></h1>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <dl class="dl-horizontal">
+      <% if @payment.started_at.present? %>
+        <dt>Started at</dt>
+        <dd><%= l(@payment.started_at, format: :long) %></dd>
+      <% end %>
+      <dt>Amount</dt>
+      <dd><%= number_to_currency(@payment.amount, precision: 2) %></dd>
+      <dt>Description</dt>
+      <dd><%= @payment.description %></dd>
+      <% if @payment.payment_method == Buckaruby::PaymentMethod::IDEAL %>
+        <dt>Payment issuer</dt>
+        <dd><%= @payment.payment_issuer %></dd>
+      <% end %>
+      <dt>Transaction ID</dt>
+      <dd><%= @payment.transaction_id %></dd>
+      <% if @payment.payment_id.present? %>
+        <dt>Payment ID</dt>
+        <dd><%= @payment.payment_id %></dd>
+      <% end %>
+      <dt>Status</dt>
+      <dd><%= show_payment_status(@payment.status) %></dd>
+      <dt>Mode</dt>
+      <dd><%= @payment.mode.capitalize %></dd>
+      <% if @payment.paid_at.present? %>
+        <dt>Paid at</dt>
+        <dd><%= l(@payment.paid_at, format: :long) %></dd>
+      <% end %>
+      <% if @payment.cancelled_at.present? %>
+        <dt>Cancelled at</dt>
+        <dd><%= l(@payment.cancelled_at, format: :long) %></dd>
+      <% end %>
+      <% if @payment.failed_at.present? %>
+        <dt>Failed at</dt>
+        <dd><%= l(@payment.failed_at, format: :long) %></dd>
+      <% end %>
+      <% if @payment.charged_back_at.present? %>
+        <dt>Charged back at</dt>
+        <dd><%= l(@payment.charged_back_at, format: :long) %></dd>
+      <% end %>
+    </dl>
+  </div>
+</div>
+
+<%= link_to "Back", payments_path, class: "btn btn-default" %>
