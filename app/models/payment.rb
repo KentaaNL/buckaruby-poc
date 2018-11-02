@@ -11,11 +11,11 @@ class Payment < ActiveRecord::Base
 
     case response.transaction_status
     when Buckaruby::TransactionStatus::SUCCESS
-      self.paid_at = Time.now
+      self.paid_at = Time.current
     when Buckaruby::TransactionStatus::FAILED, Buckaruby::TransactionStatus::REJECTED
-      self.failed_at = Time.now
+      self.failed_at = Time.current
     when Buckaruby::TransactionStatus::CANCELLED
-      self.cancelled_at = Time.now
+      self.cancelled_at = Time.current
     end
 
     save!
@@ -23,7 +23,7 @@ class Payment < ActiveRecord::Base
 
   def refund(response)
     if response.transaction_status == Buckaruby::TransactionStatus::SUCCESS
-      self.charged_back_at = Time.now
+      self.charged_back_at = Time.current
     end
 
     save!

@@ -1,5 +1,5 @@
 class PaymentsController < ApplicationController
-  skip_before_filter :verify_authenticity_token, only: [:buckaroo_return, :buckaroo_callback]
+  skip_before_action :verify_authenticity_token, only: [:buckaroo_return, :buckaroo_callback]
 
   helper_method :payment_issuers
 
@@ -34,7 +34,7 @@ class PaymentsController < ApplicationController
       )
       response = buckaroo_gateway.setup_transaction(transaction_options)
 
-      @payment.started_at = Time.now
+      @payment.started_at = Time.current
       @payment.transaction_id = response.transaction_id
       @payment.status = response.transaction_status
 
@@ -106,7 +106,7 @@ class PaymentsController < ApplicationController
   def cancel
     payment = Payment.find(params[:id])
 
-    response = buckaroo_gateway.cancel_transaction(transaction_id: payment.transaction_id)
+    buckaroo_gateway.cancel_transaction(transaction_id: payment.transaction_id)
 
     redirect_to payment, notice: "Cancel was successfully executed."
   rescue Buckaruby::BuckarooException => ex
@@ -133,7 +133,7 @@ class PaymentsController < ApplicationController
       transaction_options = @payment.to_transaction(transaction_id: @original_payment.transaction_id)
       response = buckaroo_gateway.recurrent_transaction(transaction_options)
 
-      @payment.started_at = Time.now
+      @payment.started_at = Time.current
       @payment.transaction_id = response.transaction_id
       @payment.status = response.transaction_status
 

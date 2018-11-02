@@ -1,6 +1,6 @@
 class IbanValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    if value && !value.empty?
+    if value.present?
       # IBAN code should start with country code (2 letters)
       if value !~ /^[A-Z]{2}/i
         record.errors.add(attribute, :invalid)
