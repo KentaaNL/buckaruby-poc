@@ -7,6 +7,8 @@ Rails.application.routes.draw do
     end
     member do
       post 'status' => 'payments#status', as: :status
+      post 'cancel' => 'payments#cancel', as: :cancel
+      post 'refund' => 'payments#refund', as: :refund
       get 'recur' => 'payments#recur', as: :recur
       post 'recurrent' => 'payments#recurrent', as: :recurrent
     end

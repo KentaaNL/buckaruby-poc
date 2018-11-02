@@ -18,10 +18,10 @@
   </div>
 
   <% unless @payment.recurrent? %>
-    <% if @payment.payment_method == Buckaruby::PaymentMethod::IDEAL %>
+    <% if @payment.payment_method == Buckaruby::PaymentMethod::IDEAL || @payment.payment_method == Buckaruby::PaymentMethod::IDEAL_PROCESSING %>
       <div class="form-group <%= "has-error" if @payment.errors[:payment_issuer].present? %>">
         <%= f.label :payment_issuer %>
-        <%= f.select :payment_issuer, payment_issuers.invert.sort, { prompt: "Select a payment issuer" }, { class: "form-control" } %>
+        <%= f.select :payment_issuer, payment_issuers_as_options, { prompt: "Select a payment issuer" }, { class: "form-control" } %>
         <% if @payment.errors[:payment_issuer].present? %>
           <p class="help-block"><%= @payment.errors[:payment_issuer].first %></p>
         <% end %>

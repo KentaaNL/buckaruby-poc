@@ -13,7 +13,7 @@
       <dd><%= number_to_currency(@payment.amount, precision: 2) %></dd>
       <dt>Description</dt>
       <dd><%= @payment.description %></dd>
-      <% if @payment.payment_method == Buckaruby::PaymentMethod::IDEAL %>
+      <% if @payment.payment_method == Buckaruby::PaymentMethod::IDEAL || @payment.payment_method == Buckaruby::PaymentMethod::IDEAL_PROCESSING %>
         <dt>Payment issuer</dt>
         <dd><%= @payment.payment_issuer %></dd>
       <% end %>

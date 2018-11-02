@@ -55,6 +55,8 @@ GEM
       railties (~> 4.0)
     erubis (2.7.0)
     execjs (2.7.0)
+    font-awesome-rails (4.7.0.4)
+      railties (>= 3.2, < 6.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     i18n (0.9.5)
@@ -154,6 +156,7 @@ DEPENDENCIES
   buckaruby (~> 1.1.0)
   byebug
   dotenv-rails (~> 2.0.1)
+  font-awesome-rails (~> 4.7.0.4)
   jbuilder (~> 2.0)
   jquery-rails
   pg (~> 0.19.0)

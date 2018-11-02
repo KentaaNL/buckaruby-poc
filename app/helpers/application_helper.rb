@@ -3,6 +3,8 @@ module ApplicationHelper
     case payment_method
     when Buckaruby::PaymentMethod::IDEAL
       image_tag('payments/ideal.png') + ' iDEAL'
+    when Buckaruby::PaymentMethod::IDEAL_PROCESSING
+      image_tag('payments/ideal.png') + ' iDEAL (processing)'
     when Buckaruby::PaymentMethod::VISA
       image_tag('payments/visa.png') + ' Visa'
     when Buckaruby::PaymentMethod::MASTER_CARD
@@ -33,5 +35,9 @@ module ApplicationHelper
     else
       "Unknown"
     end
+  end
+
+  def payment_issuers_as_options
+    payment_issuers.invert.sort { |a, b| a.first.downcase <=> b.first.downcase }
   end
 end

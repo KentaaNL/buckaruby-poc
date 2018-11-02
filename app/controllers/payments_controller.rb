@@ -6,7 +6,7 @@ class PaymentsController < ApplicationController
   # GET /payments
   def index
     @payments = Payment.order(created_at: :desc)
-    @payment_methods = [Buckaruby::PaymentMethod::IDEAL, Buckaruby::PaymentMethod::VISA, Buckaruby::PaymentMethod::MASTER_CARD, Buckaruby::PaymentMethod::MAESTRO, Buckaruby::PaymentMethod::SEPA_DIRECT_DEBIT, Buckaruby::PaymentMethod::PAYPAL, Buckaruby::PaymentMethod::BANCONTACT_MISTER_CASH]
+    @payment_methods = [Buckaruby::PaymentMethod::IDEAL, Buckaruby::PaymentMethod::IDEAL_PROCESSING, Buckaruby::PaymentMethod::VISA, Buckaruby::PaymentMethod::MASTER_CARD, Buckaruby::PaymentMethod::MAESTRO, Buckaruby::PaymentMethod::SEPA_DIRECT_DEBIT, Buckaruby::PaymentMethod::PAYPAL, Buckaruby::PaymentMethod::BANCONTACT_MISTER_CASH]
   end
 
   # GET /payments/1
@@ -28,8 +28,6 @@ class PaymentsController < ApplicationController
 
     if @payment.save
       transaction_options = @payment.to_transaction(
-        amount: @payment.amount,
-        description: @payment.description,
         recurring: @payment.recurring,
         return_url: buckaroo_return_payments_url,
         client_ip: request.remote_ip
@@ -85,6 +83,40 @@ class PaymentsController < ApplicationController
     redirect_to payment
   end
 
+  # POST /payments/1/refund
+  def refund
+    payment = Payment.find(params[:id])
+
+    response = buckaroo_gateway.refund_transaction(transaction_id: payment.transaction_id)
+
+    if response.status == Buckaruby::TransactionStatus::SUCCESS
+      redirect_to payment, notice: "Refund was successfully executed."
+    else
+      redirect_to payment, error: "Refund failed."
+    end
+  rescue Buckaruby::BuckarooException => ex
+    flash[:error] = "Buckaroo exception: #{ex.message}"
+    redirect_to payment
+  rescue ArgumentError => ex
+    flash[:error] = "Argument error: #{ex.message}"
+    redirect_to payment
+  end
+
+  # POST /payments/1/cancel
+  def cancel
+    payment = Payment.find(params[:id])
+
+    response = buckaroo_gateway.cancel_transaction(transaction_id: payment.transaction_id)
+
+    redirect_to payment, notice: "Cancel was successfully executed."
+  rescue Buckaruby::BuckarooException => ex
+    flash[:error] = "Buckaroo exception: #{ex.message}"
+    redirect_to payment
+  rescue ArgumentError => ex
+    flash[:error] = "Argument error: #{ex.message}"
+    redirect_to payment
+  end
+
   # GET /payments/1/recur
   def recur
     @original_payment = Payment.find(params[:id])
@@ -98,11 +130,7 @@ class PaymentsController < ApplicationController
     @payment.assign_attributes(payment_params)
 
     if @payment.save
-      transaction_options = @payment.to_transaction(
-        amount: @payment.amount,
-        description: @payment.description,
-        transaction_id: @original_payment.transaction_id
-      )
+      transaction_options = @payment.to_transaction(transaction_id: @original_payment.transaction_id)
       response = buckaroo_gateway.recurrent_transaction(transaction_options)
 
       @payment.started_at = Time.now
@@ -124,7 +152,8 @@ class PaymentsController < ApplicationController
 
   # POST /payments/buckaroo_return
   def buckaroo_return
-    response = buckaroo_gateway.callback(params)
+    Rails.logger.info("request.raw_post: #{request.raw_post}")
+    response = buckaroo_gateway.callback(request.raw_post)
 
     if response.invoicenumber.present?
       payment = Payment.find(response.invoicenumber)
@@ -172,7 +201,7 @@ class PaymentsController < ApplicationController
   private
 
   def payment_params
-    params.require(:payment).permit(:amount, :description, :payment_method, :payment_issuer, :payment_account_name, :payment_account_iban, :recurring)
+    params.require(:payment).permit(:amount, :currency, :description, :payment_method, :payment_issuer, :payment_account_name, :payment_account_iban, :recurring)
   end
 
   def buckaroo_gateway

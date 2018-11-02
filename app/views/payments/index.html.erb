@@ -23,18 +23,53 @@
     <% @payments.each do |payment| %>
       <tr>
         <td><%= l payment.started_at, format: :long if payment.started_at.present? %></td>
-        <td><%= number_to_currency(payment.amount, precision: 2) %></td>
+        <td><%= number_to_currency(payment.amount, precision: 2, scope: payment.currency) %></td>
         <td><%= payment.description %></td>
         <td><%= show_payment_method(payment.payment_method) %></td>
         <td><%= show_payment_status(payment.status) %></td>
         <td><%= payment.mode.capitalize %></td>
         <td class="text-right">
-          <% if payment.recurring? && payment.paid? %>
-            <%= link_to "Recur", recur_payment_path(payment), class: "btn btn-default btn-sm" %>
+          <%= link_to payment_path(payment), class: "btn btn-default" do %>
+            <% fa_icon "eye" %>
           <% end %>
-          <%= link_to "Show", payment_path(payment), class: "btn btn-default btn-sm" %>
-          <%= link_to "Update", status_payment_path(payment), method: :post, class: "btn btn-default btn-sm" %>
-          <%= link_to "Destroy", payment_path(payment), method: :delete, data: { confirm: "Are you sure you want to delete this payment?" }, class: "btn btn-danger btn-sm" %>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <%= fa_icon "cog", class: "fa-fixed-width" %> <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <% if payment.recurring? && payment.paid? %>
+                <li>
+                  <%= link_to recur_payment_path(payment) do %>
+                    <%= fa_icon "forward", class: "fa-fixed-width" %>&nbsp;Recur
+                  <% end %>
+                </li>
+              <% end %>
+              <li>
+                <%= link_to status_payment_path(payment), method: :post do %>
+                  <%= fa_icon "retweet", class: "fa-fixed-width" %>&nbsp;Update
+                <% end %>
+              </li>
+              <% if payment.pending? %>
+                <li>
+                  <%= link_to cancel_payment_path(payment), method: :post do %>
+                    <%= fa_icon "times", class: "fa-fixed-width" %>&nbsp;Cancel
+                  <% end %>
+                </li>
+              <% end %>
+              <% if payment.paid? %>
+                <li>
+                  <%= link_to refund_payment_path(payment), method: :post do %>
+                    <%= fa_icon "undo", class: "fa-fixed-width" %>&nbsp;Refund
+                  <% end %>
+                </li>
+              <% end %>
+              <li>
+                <%= link_to payment_path(payment), method: :delete, data: { confirm: "Are you sure you want to delete this payment?" } do %>
+                  <%= fa_icon "trash-o", class: "fa-fixed-width" %>&nbsp;Destroy
+                <% end %>
+              </li>
+            </ul>
+          </div>
         </td>
       </tr>
     <% end %>
