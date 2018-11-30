@@ -43,7 +43,7 @@ GEM
     bootstrap-sass (3.3.7)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
-    buckaruby (1.1.0)
+    buckaruby (1.1.1)
     builder (3.2.3)
     byebug (9.0.6)
     concurrent-ruby (1.1.3)
