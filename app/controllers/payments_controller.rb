@@ -152,8 +152,7 @@ class PaymentsController < ApplicationController
 
   # POST /payments/buckaroo_return
   def buckaroo_return
-    Rails.logger.info("request.raw_post: #{request.raw_post}")
-    response = buckaroo_gateway.callback(request.raw_post)
+    response = buckaroo_gateway.callback(params)
 
     if response.invoicenumber.present?
       payment = Payment.find(response.invoicenumber)
