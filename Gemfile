@@ -15,7 +15,7 @@ gem 'bootstrap-sass', '~> 3.4.1'
 gem 'font-awesome-rails', '~> 4.7.0.4'
 
 # Use jquery as the JavaScript library
-gem 'jquery-rails'
+gem 'jquery-rails', '>= 4.3.4'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
